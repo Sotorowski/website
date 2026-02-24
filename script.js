@@ -167,3 +167,72 @@ window.addEventListener('load', () => {
         document.body.style.opacity = '1';
     }, 100);
 });
+
+// Auto-scroll functionality for projects
+const projectsGrid = document.querySelector('.projects-grid');
+let isScrolling = false;
+let scrollDirection = 1;
+let scrollInterval;
+
+function startAutoScroll() {
+    if (!projectsGrid) return;
+    
+    scrollInterval = setInterval(() => {
+        if (!isScrolling) {
+            const maxScroll = projectsGrid.scrollWidth - projectsGrid.clientWidth;
+            
+            if (projectsGrid.scrollLeft >= maxScroll) {
+                scrollDirection = -1;
+            } else if (projectsGrid.scrollLeft <= 0) {
+                scrollDirection = 1;
+            }
+            
+            projectsGrid.scrollBy({
+                left: scrollDirection * 1,
+                behavior: 'smooth'
+            });
+        }
+    }, 30);
+}
+
+function stopAutoScroll() {
+    clearInterval(scrollInterval);
+}
+
+// Start auto-scroll when projects section is visible
+const projectsSection = document.getElementById('projects');
+const autoScrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            startAutoScroll();
+        } else {
+            stopAutoScroll();
+        }
+    });
+}, { threshold: 0.3 });
+
+if (projectsSection) {
+    autoScrollObserver.observe(projectsSection);
+}
+
+// Pause auto-scroll on hover
+if (projectsGrid) {
+    projectsGrid.addEventListener('mouseenter', () => {
+        isScrolling = true;
+    });
+    
+    projectsGrid.addEventListener('mouseleave', () => {
+        isScrolling = false;
+    });
+    
+    // Touch support for mobile
+    projectsGrid.addEventListener('touchstart', () => {
+        isScrolling = true;
+    });
+    
+    projectsGrid.addEventListener('touchend', () => {
+        setTimeout(() => {
+            isScrolling = false;
+        }, 2000);
+    });
+}
